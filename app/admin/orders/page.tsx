@@ -1,0 +1,6 @@
+import {createAdminClient} from '@/lib/supabase/server'
+import {updateOrderStatus} from '../actions'
+export default async function AdminOrders(){
+ const {data}=await createAdminClient().from('orders').select('id,status,payment_status,total_amount,created_at,delivery_address,user_id').order('created_at',{ascending:false}).limit(200)
+ return <div className="fade-page"><h2>Orders</h2><div className="table-wrap"><table className="table"><thead><tr><th>Order</th><th>Date</th><th>Payment</th><th>Total</th><th>Delivery</th><th>Status</th></tr></thead><tbody>{(data||[]).map((o:any)=><tr key={o.id}><td>{o.id.slice(0,8)}</td><td>{new Date(o.created_at).toLocaleString('en-IN')}</td><td>{o.payment_status}</td><td>₹{Number(o.total_amount).toLocaleString('en-IN')}</td><td>{o.delivery_address?.name}<br/><span className="muted">{o.delivery_address?.phone}</span></td><td><form action={updateOrderStatus} className="actions"><input type="hidden" name="id" value={o.id}/><select className="input" name="status" defaultValue={o.status}>{['pending','confirmed','processing','shipped','delivered','cancelled'].map(s=><option key={s}>{s}</option>)}</select><button className="btn btn-dark small">Save</button></form></td></tr>)}</tbody></table></div></div>
+}
