@@ -10,6 +10,11 @@ create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   image_url text,
+  feature_kicker text,
+  feature_title text,
+  feature_font text not null default 'serif',
+  feature_order integer not null default 0,
+  feature_enabled boolean not null default false,
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );

@@ -59,6 +59,8 @@ Passwords are handled by Supabase Auth and are never stored in `public.profiles`
 If Supabase Auth > Providers > Email has Confirm email enabled, new customers must confirm their email before the first login.
 Add `/auth/update-password` to your allowed redirect URLs for password-reset flow.
 
+Customer bags are kept separately per signed-in account in the browser. A guest bag is merged into that account when the customer signs in; items remain until the customer removes them or a successful checkout clears the bag.
+
 ## Storefront and daily rate management
 
 - `/admin/rates`: add or edit the INR price per gram. Effective dates use India time; future rates appear from their effective date. The latest applicable rate appears in the top-left storefront strip and drives product prices.

@@ -24,3 +24,15 @@ export async function fulfillOrder(admin: ReturnType<typeof createAdminClient>, 
   })
   if (error) throw new CheckoutError('Payment confirmation is pending. Please contact the store with your payment ID; do not pay again.', 503)
 }
+
+export async function assertPaymentFulfillment(admin: ReturnType<typeof createAdminClient>) {
+  // The function rejects these sentinel values before selecting or writing any row.
+  // Verify deployment and service-role permissions before creating a payable order.
+  const { error } = await admin.rpc('fulfill_paid_order', {
+    p_order_id: '00000000-0000-0000-0000-000000000000',
+    p_razorpay_order_id: '', p_payment_id: '', p_amount_paise: 0,
+  })
+  if (error?.code !== '22023' || !error.message.includes('Invalid payment details')) {
+    throw new CheckoutError('Online payment is temporarily unavailable. Please contact the store to place your order.', 503)
+  }
+}

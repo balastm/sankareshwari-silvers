@@ -1,0 +1,1 @@
+export default function Loading() { return <main className="container section" aria-busy="true" aria-label="Loading the store"><div className="eyebrow" role="status">Finding your next treasured piece…</div><div className="loading-block" /><div className="grid">{[1, 2, 3].map(i => <div className="loading-block" key={i} />)}</div></main> }

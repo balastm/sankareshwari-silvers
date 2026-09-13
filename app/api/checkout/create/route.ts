@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { CheckoutError, priceCheckout, validateCheckout } from '@/lib/checkout-validation'
-import { razorpayCredentials, razorpayRequest } from '@/lib/payments'
+import { assertPaymentFulfillment, razorpayCredentials, razorpayRequest } from '@/lib/payments'
 import { todayInIndia } from '@/lib/dates'
 
 export async function POST(request: Request) {
@@ -12,6 +12,7 @@ export async function POST(request: Request) {
     const { items, delivery } = validateCheckout(await request.json())
     const { keyId } = razorpayCredentials()
     const admin = createAdminClient()
+    await assertPaymentFulfillment(admin)
     const [products, rate] = await Promise.all([
       admin.from('products').select('id,name,weight_grams,making_charge,pricing_mode,piece_rate,stock_pcs,stock_grams,is_active').in('id', items.map(item => item.product_id)),
       admin.from('silver_rates').select('rate_per_gram').lte('effective_date', todayInIndia()).order('effective_date', { ascending: false }).limit(1).maybeSingle(),

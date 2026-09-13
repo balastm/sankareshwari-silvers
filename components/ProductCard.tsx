@@ -1,5 +1,6 @@
 import AddToCartButton from './AddToCartButton'
-import Image from 'next/image'
+import Link from 'next/link'
+import ProductImage from './admin/ProductImage'
 import { availableStock, formatPrice, sellingPrice, type ProductListItem } from '@/lib/products'
 
 export default function ProductCard({p, rate}:{p:ProductListItem;rate:number}) {
@@ -8,12 +9,13 @@ export default function ProductCard({p, rate}:{p:ProductListItem;rate:number}) {
   const price = sellingPrice(p, rate)
   const priced = p.pricing_mode === 'piece' ? Number(p.piece_rate) > 0 : rate > 0
   return <article className="card">
-    <div className="product-media">
-      {p.image_url ? <Image src={p.image_url} alt={p.name} width={640} height={640} unoptimized /> : null}
+    <Link href={`/products/${p.id}`} className="product-media product-media-link" aria-label={`View ${p.name}`}>
+      <ProductImage src={p.image_url} name={p.name} className="product-card-image" />
       <span className={`badge ${out?'out':''}`}>{out?'Sold out':'Available'}</span>
-    </div>
+    </Link>
     <div className="card-body">
-      <div className="product-title">{p.name}</div>
+      <div className="product-category-label">{p.category?.name || 'Silver collection'}</div>
+      <Link href={`/products/${p.id}`} className="product-title">{p.name}</Link>
       <div className="meta"><span>{p.pricing_mode === 'piece' ? 'Per piece' : `${Number(p.weight_grams).toFixed(2)} g`}</span></div>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12}}>
         <span className="price">{priced ? formatPrice(price) : 'Price available soon'}</span>

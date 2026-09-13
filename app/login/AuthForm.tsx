@@ -78,7 +78,8 @@ export default function AuthForm({ next }: { next: string }) {
       }
     } catch (err: any) {
       setIsError(true)
-      setMessage(err?.message || 'Unable to continue. Please try again.')
+      const code = err?.code || err?.name
+      setMessage(code === 'email_not_confirmed' ? 'Please confirm your email using the link we sent, then log in. Check your spam folder too.' : err?.message || 'Unable to continue. Please try again.')
     } finally {
       setLoading(false)
     }

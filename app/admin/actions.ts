@@ -18,6 +18,10 @@ export async function saveCategory(_previous:{error?:string},fd:FormData):Promis
  await requireAdmin()
  const id=String(fd.get('id')||'')
  const name=String(fd.get('name')||'').trim()
+ const featureKicker=String(fd.get('feature_kicker')||'').trim().slice(0,80)
+ const featureTitle=String(fd.get('feature_title')||'').trim().slice(0,100)
+ const featureFont=String(fd.get('feature_font')||'serif')==='sans'?'sans':'serif'
+ const featureOrder=Math.max(0,Math.min(99,Math.floor(Number(fd.get('feature_order')||0))))
  if(id && !UUID_PATTERN.test(id)) return {error:'This category could not be found.'}
  if(!name) return {error:'Enter a category name.'}
  const file=fd.get('image')
@@ -41,7 +45,7 @@ export async function saveCategory(_previous:{error?:string},fd:FormData):Promis
    uploadedPath=path
    image_url=a.storage.from('product-images').getPublicUrl(path).data.publicUrl
   }
-  const data={name,image_url,...(!id?{is_active:true}:{})}
+  const data={name,image_url,feature_kicker:featureKicker||null,feature_title:featureTitle||null,feature_font:featureFont,feature_order:featureOrder,feature_enabled:fd.get('feature_enabled')==='on',...(!id?{is_active:true}:{})}
   const result=id ? await a.from('categories').update(data).eq('id',id).select('id').maybeSingle() : await a.from('categories').insert(data).select('id').single()
   if(result.error) throw result.error
   if(!result.data) throw new Error('Category no longer exists')
@@ -129,4 +133,24 @@ export async function deleteProduct(_previous: ProductActionState, fd: FormData)
   revalidatePath('/')
   return { success: true }
 }
-export async function updateOrderStatus(fd:FormData){await requireAdmin();await createAdminClient().from('orders').update({status:String(fd.get('status'))}).eq('id',String(fd.get('id')));revalidatePath('/admin/orders')}
+export async function updateOrderStatus(fd:FormData){
+  await requireAdmin()
+  const { orderStatusError } = await import('@/lib/order-status')
+  const id=String(fd.get('id')||''),status=String(fd.get('status')||'')
+  let message=''
+  if(!UUID_PATTERN.test(id)) message='Invalid order.'
+  else {
+    const admin=createAdminClient()
+    const {data:order,error}=await admin.from('orders').select('status,payment_status').eq('id',id).maybeSingle()
+    if(error||!order) message='The order could not be loaded.'
+    else {
+      message=orderStatusError(order.status,status,order.payment_status)||''
+      if(!message){
+        const result=await admin.from('orders').update({status}).eq('id',id).eq('status',order.status).eq('payment_status',order.payment_status).select('id').maybeSingle()
+        if(result.error||!result.data) message='The order changed or could not be saved. Refresh and try again.'
+      }
+    }
+  }
+  revalidatePath('/admin/orders');revalidatePath('/orders')
+  redirect(message?`/admin/orders?error=${encodeURIComponent(message)}`:'/admin/orders?saved=1')
+}

@@ -1,4 +1,4 @@
-export type CategoryOption = { id: string; name: string; image_url?: string | null; is_active?: boolean }
+export type CategoryOption = { id: string; name: string; image_url?: string | null; feature_kicker?: string | null; feature_title?: string | null; feature_font?: 'serif' | 'sans' | null; feature_order?: number | null; feature_enabled?: boolean; is_active?: boolean }
 
 export type Product = {
   id: string

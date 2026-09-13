@@ -1,6 +1,11 @@
 -- Category photographs and weight / per-piece pricing. Preserves all existing rows.
 begin;
 alter table public.categories add column if not exists image_url text;
+alter table public.categories add column if not exists feature_kicker text;
+alter table public.categories add column if not exists feature_title text;
+alter table public.categories add column if not exists feature_font text not null default 'serif';
+alter table public.categories add column if not exists feature_order integer not null default 0;
+alter table public.categories add column if not exists feature_enabled boolean not null default false;
 do $$ begin
  if exists(select 1 from information_schema.columns where table_schema='public' and table_name='categories' and column_name='slug') then
   alter table public.categories alter column slug set default gen_random_uuid()::text;

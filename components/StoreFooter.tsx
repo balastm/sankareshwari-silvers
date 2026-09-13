@@ -1,0 +1,4 @@
+import Link from 'next/link'
+export default function StoreFooter() {
+  return <footer className="footer"><div className="container footer-grid"><div><Link href="/" className="brand">Sankareshwari<span>Silvers</span></Link><p>Thoughtful pieces. Meaningful moments.<br />From our store in Eral to your collection.</p></div><div><strong>Explore</strong><Link href="/#products">Shop the collection</Link><Link href="/orders">Your orders</Link><Link href="/account">Your account</Link></div><div><strong>We’re here to help</strong><a href="tel:+919655570730">+91 96555 70730</a><Link href="/help">Shopping & silver care</Link><Link href="/#contact">Visit our Eral store ↗</Link></div></div><div className="container footer-bottom">© {new Date().getFullYear()} Sankareshwari Silvers<span>A gift today. An heirloom tomorrow.</span></div></footer>
+}

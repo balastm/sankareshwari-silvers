@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { todayInIndia } from '@/lib/dates'
+import CartLink from './CartLink'
 
 export default async function Header() {
   const supabase = await createClient()
@@ -12,7 +13,7 @@ export default async function Header() {
       <Link href="/">Home</Link>
       <Link href="/#products">Products</Link>
       <Link href="/#contact">Contact Us</Link>
-      <Link href="/cart">Cart</Link>
+      <CartLink/>
       {user ? <><Link href="/orders">My Orders</Link><Link className="btn btn-dark" href="/account">Account</Link></>
       : <Link className="btn btn-dark" href="/login">Login</Link>}
     </nav>
